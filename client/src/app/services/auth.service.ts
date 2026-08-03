@@ -16,7 +16,7 @@ interface AuthResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly API = 'http://localhost:3440/api/auth';
+  private readonly API = '/api/auth';
   private currentUser = signal<User | null>(null);
 
   user = this.currentUser.asReadonly();

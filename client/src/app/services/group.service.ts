@@ -12,7 +12,7 @@ export interface Group {
 
 @Injectable({ providedIn: 'root' })
 export class GroupService {
-  private readonly API = 'http://localhost:3440/api/groups';
+  private readonly API = '/api/groups';
 
   constructor(private http: HttpClient) {}
 

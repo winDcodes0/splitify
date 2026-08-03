@@ -21,7 +21,7 @@ export interface Expense {
 
 @Injectable({ providedIn: 'root' })
 export class ExpenseService {
-  private readonly API = 'http://localhost:3440/api/expense';
+  private readonly API = '/api/expense';
 
   constructor(private http: HttpClient) {}
 
