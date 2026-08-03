@@ -52,3 +52,4 @@ client/dist/
 
 # Local Database Data
 data/
+.aws/

@@ -7,23 +7,20 @@ const app = express();
 
 const connectDB = require("./config/db");
 
-const authRoutes = require('./routes/authRoutes')
-const groupRoutes = require('./routes/groupRoutes')
-const expenseRoutes = require('./routes/expenseRoutes')
+const authRoutes = require("./routes/authRoutes");
+const groupRoutes = require("./routes/groupRoutes");
+const expenseRoutes = require("./routes/expenseRoutes");
 
-app.use(cors({
-  origin: "http://localhost:4200",
-  credentials: true
-}));
-app.use(express.json()); // midleware
+// Allow requests from anywhere
+app.use(cors());
 
-app.use("/api/auth", authRoutes); // auth routes
-app.use("/api/groups", groupRoutes); // group routes
-app.use("/api/expense", expenseRoutes); // expense routes
+app.use(express.json());
 
-//--------------------------------------------------------------------------------
+app.use("/api/auth", authRoutes);
+app.use("/api/groups", groupRoutes);
+app.use("/api/expense", expenseRoutes);
 
-connectDB(); // Connect to MongoDB
+connectDB();
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}`);
