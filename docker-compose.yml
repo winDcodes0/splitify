@@ -4,6 +4,7 @@ services:
   mongodb:
     image: mongo:latest
     container_name: splitly-mongodb
+    restart: always
     ports:
       - "27017:27017"
     volumes:
@@ -14,6 +15,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: splitly-backend
+    restart: always
     ports:
       - "3440:3440"
     environment:
@@ -29,6 +31,7 @@ services:
       context: ./client
       dockerfile: Dockerfile
     container_name: splitly-frontend
+    restart: always
     ports:
       - "80:80"
     depends_on:

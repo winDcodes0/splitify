@@ -7,6 +7,8 @@ async function connectDB() {
   } 
   catch (error) {
     console.error("Error connecting to MongoDB:", error);
+    // Exit process with failure so Docker can restart the container
+    process.exit(1);
   }
 }
 
