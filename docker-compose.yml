@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: splitly-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: splitly-backend
+    ports:
+      - "3440:3440"
+    environment:
+      - PORT=3440
+      - MONGO_URI=mongodb://mongodb:27017/splitly
+      - JWT_SECRET=892zpwoierfj4n509183
+      - JWT_EXPIRES_IN=7d
+    depends_on:
+      - mongodb
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: splitly-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:

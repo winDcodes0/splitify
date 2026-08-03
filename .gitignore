@@ -49,3 +49,6 @@ tmp/
 out/
 client/.angular/
 client/dist/
+
+# Local Database Data
+data/
