@@ -21,10 +21,9 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          port: ${{ secrets.EC2_PORT || '22' }}
           source: "."
-          target: "~/splitly"
-          rm: true # This will remove old files on the target directory before copying
+          target: "/home/${{ secrets.EC2_USERNAME }}/splitly"
+          rm: false # Set to false to prevent errors if the target directory doesn't exist yet
 
       - name: Build and restart Docker containers
         uses: appleboy/ssh-action@v1.0.3
@@ -32,13 +31,12 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          port: ${{ secrets.EC2_PORT || '22' }}
           script: |
-            # --- IMPORTANT: Update the path below if you changed the target above ---
-            cd ~/splitly
+            cd /home/${{ secrets.EC2_USERNAME }}/splitly
             
-            # Clean up old unused docker images and containers to free up space
-            docker system prune -af
+            # Prune unused docker assets safely
+            docker system prune -f || true
             
-            # Rebuild and restart the Docker containers in the background
+            # Rebuild and restart containers
+            docker compose down || true
             docker compose up --build -d
