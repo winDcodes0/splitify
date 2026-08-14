@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear System — High-Density Dark Mode Workspace</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=scale" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            /* 1. Color Palette & Token System */
+            --bg-canvas: #08090A;
+            --surface-elevated: #101114;
+            --surface-overlay: #16181D;
+            --surface-hover: #1F2228;
+            --surface-active: #262A32;
+            
+            --text-primary: #F2F4F8;
+            --text-secondary: #9CA3AF;
+            --text-tertiary: #6B7280;
+            --text-body: #D1D5DB;
+            
+            --border-hairline: rgba(255, 255, 255, 0.08);
+            --border-active: rgba(255, 255, 255, 0.18);
+            
+            --brand-accent: #5E6AD2;
+            --brand-glow: rgba(94, 106, 210, 0.25);
+            --brand-accent-hover: #6E7BE0;
+            
+            --status-backlog: #6B7280;
+            --status-progress: #F59E0B;
+            --status-done: #10B981;
+            --status-canceled: #EF4444;
+
+            /* 2. Typography & Hierarchy */
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+
+            /* 3. Layout & Geometry */
+            --radius-outer: 10px;
+            --radius-card: 6px;
+            --radius-button: 4px;
+            --radius-kbd: 4px;
+            
+            --shadow-micro: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.6);
+            --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.7), 0 2px 6px rgba(0, 0, 0, 0.4);
+            
+            /* Animation & Micro-Interactions */
+            --transition-snappy: all 120ms cubic-bezier(0.16, 1, 0.3, 1);
+            
+            /* Sidebar Width */
+            --sidebar-width: 240px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-body);
+            font-family: var(--font-sans);
+            font-size: 13px;
+            line-height: 1.4;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            user-select: none;
+        }
+
+        /* Utility Typography Classes */
+        .text-title {
+            font-size: 20px;
+            line-height: 1.25;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+        .text-section {
+            font-size: 14px;
+            line-height: 1.3;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        .text-body {
+            font-size: 13px;
+            line-height: 1.4;
+            font-weight: 400;
+            color: var(--text-body);
+        }
+        .text-meta {
+            font-size: 12px;
+            line-height: 1.4;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .text-mono {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        /* Hotkey Tags */
+        kbd, .kbd-tag {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-tertiary);
+            background-color: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-hairline);
+            border-radius: var(--radius-kbd);
+            padding: 1px 5px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2;
+            height: 18px;
+            min-width: 18px;
+        }
+
+        /* ----------------------------------------------------
+           App Layout Grid 
+        ---------------------------------------------------- */
+        .app-layout {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* ----------------------------------------------------
+           Sidebar
+        ---------------------------------------------------- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-canvas);
+            border-right: 1px solid var(--border-hairline);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            padding: 12px 8px;
+            gap: 16px;
+        }
+
+        .workspace-switcher {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 8px;
+            border-radius: var(--radius-card);
+            cursor: pointer;
+            transition: var(--transition-snappy);
+        }
+
+        .workspace-switcher:hover {
+            background-color: var(--surface-hover);
+        }
+
+        .workspace-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .workspace-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            background: linear-gradient(135deg, #5E6AD2 0%, #8B5CF6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 11px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+
+        .workspace-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+
+        .quick-action-btn {
+            width: 100%;
+            height: 32px;
+            background-color: var(--surface-elevated);
+            border: 1px solid var(--border-hairline);
+            border-radius: var(--radius-card);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+            cursor: pointer;
+            transition: var(--transition-snappy);
+        }
+
+        .quick-action-btn:hover {
+            background-color: var(--surface-hover);
+            border-color: var(--border-active);
+            color: var(--text-primary);
+        }
+
+        .nav-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .nav-header {
+            padding: 6px 8px 4px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 28px;
+            padding: 0 8px;
+            border-radius: var(--radius-card);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition-snappy);
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background-color: var(--surface-hover);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background-color: var(--surface-hover);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .nav-item-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-icon {
+            width: 15px;
+            height: 15px;
+            stroke-width: 1.5px;
+            color: var(--text-secondary);
+        }
+
+        .nav-item.active .nav-icon {
+            color: var(--brand-accent);
+        }
+
+        .nav-badge {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-tertiary);
+        }
+
+        /* Spotlight Effect on Containers */
+        .spotlight-card {
+            position: relative;
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+        }
+
+        .spotlight-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.05), transparent 40%);
+            opacity: 0;
+            transition: opacity 200ms ease;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .spotlight-card:hover::before {
+            opacity: 1;
+        }
+
+        /* ----------------------------------------------------
+           Main Stage (Header + Content)
+        ---------------------------------------------------- */
+        .main-stage {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-canvas);
+            overflow: hidden;
+        }
+
+        /* Main Header */
+        .header {
+            height: 48px;
+            border-bottom: 1px solid var(--border-hairline);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            background-color: var(--bg-canvas);
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+        }
+
+        .breadcrumb-item {
+            color: var(--text-secondary);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .breadcrumb-item.active {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .view-switcher {
+            display: flex;
+            align-items: center;
+            background-color: var(--surface-elevated);
+            border: 1px solid var(--border-hairline);
+            border-radius: var(--radius-button);
+            padding: 2px;
+            gap: 2px;
+        }
+
+        .view-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: var(--transition-snappy);
+        }
+
+        .view-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .view-btn.active {
+            background-color: var(--surface-hover);
+            color: var(--text-primary);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 28px;
+            padding: 0 10px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: var(--radius-button);
+            cursor: pointer;
+            transition: var(--transition-snappy);
+            outline: none;
+            border: 1px solid transparent;
+        }
+
+        .btn-secondary {
+            background-color: var(--surface-elevated);
+            border-color: var(--border-hairline);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--surface-hover);
+            border-color: var(--border-active);
+        }
+
+        .btn-primary {
+            background-color: var(--brand-accent);
+            color: #FFFFFF;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--brand-accent-hover);
+        }
+
+        .btn-primary:focus-visible {
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 0 2px var(--bg-canvas), 0 0 0 4px var(--brand-accent);
+        }
+
+        /* ----------------------------------------------------
+           Filter Bar
+        ---------------------------------------------------- */
+        .filter-bar {
+            height: 36px;
+            border-bottom: 1px solid var(--border-hairline);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            background-color: var(--surface-elevated);
+            flex-shrink: 0;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            height: 24px;
+            padding: 0 8px;
+            border-radius: var(--radius-button);
+            background-color: transparent;
+            border: 1px dashed var(--border-hairline);
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-snappy);
+        }
+
+        .filter-chip:hover, .filter-chip.active {
+            border-style: solid;
+            border-color: var(--border-active);
+            background-color: var(--surface-hover);
+            color: var(--text-primary);
+        }
+
+        .display-options {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        /* ----------------------------------------------------
+           Content Area & Data Table Layout
+        ---------------------------------------------------- */
+        .content-area {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .data-header-row {
+            display: flex;
+            align-items: center;
+            height: 32px;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--border-hairline);
+            background-color: var(--bg-canvas);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        /* Dense Data Table Rows */
+        .data-row {
+            display: flex;
+            align-items: center;
+            height: 38px;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--border-hairline);
+            gap: 12px;
+            cursor: pointer;
+            transition: var(--transition-snappy);
+            position: relative;
+        }
+
+        .data-row:hover {
+            background-color: var(--surface-hover);
+        }
+
+        .data-row.selected {
+            background-color: var(--surface-active);
+        }
+
+        .data-row.selected::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 20px;
+            width: 3px;
+            background-color: var(--brand-accent);
+            border-radius: 0 2px 2px 0;
+            box-shadow: 0 0 8px var(--brand-glow);
+        }
+
+        /* Column Specifications */
+        .col-status {
+            width: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .col-priority {
+            width: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .col-id {
+            width: 70px;
+            flex-shrink: 0;
+        }
+
+        .col-title {
+            flex: 1;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tag {
+            font-size: 10px;
+            font-weight: 500;
+            padding: 1px 6px;
+            border-radius: 3px;
+            background-color: var(--surface-elevated);
+            border: 1px solid var(--border-hairline);
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .col-assignee {
+            width: 100px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .col-due {
+            width: 80px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .avatar-img {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: var(--surface-overlay);
+            border: 1px solid var(--border-hairline);
+        }
+
+        /* Status Colors */
+        .icon-backlog { color: var(--status-backlog); }
+        .icon-progress { color: var(--status-progress); }
+        .icon-done { color: var(--status-done); }
+        .icon-canceled { color: var(--status-canceled); }
+
+        /* ----------------------------------------------------
+           Detail Drawer / Side Panel
+        ---------------------------------------------------- */
+        .detail-panel {
+            width: 380px;
+            background-color: var(--surface-elevated);
+            border-left: 1px solid var(--border-hairline);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .detail-panel.hidden {
+            display: none;
+        }
+
+        .panel-header {
+            height: 48px;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--border-hairline);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-content {
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel-property-grid {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 12px 8px;
+            align-items: center;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-hairline);
+        }
+
+        .property-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+        }
+
+        .property-value {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-primary);
+        }
+
+        /* ----------------------------------------------------
+           Command Menu (⌘K Floating Overlay)
+        ---------------------------------------------------- */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(8, 9, 10, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 1000;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 120px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 150ms ease;
+        }
+
+        .modal-backdrop.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .cmd-modal {
+            width: 640px;
+            background-color: var(--surface-overlay);
+            border: 1px solid var(--border-hairline);
+            border-radius: var(--radius-outer);
+            box-shadow: var(--shadow-elevated);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: scale(0.98);
+            transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-backdrop.open .cmd-modal {
+            transform: scale(1);
+        }
+
+        .cmd-search-header {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-hairline);
+            gap: 12px;
+        }
+
+        .cmd-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 500;
+            font-family: var(--font-sans);
+            outline: none;
+            caret-color: var(--brand-accent);
+        }
+
+        .cmd-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .cmd-list {
+            padding: 8px;
+            max-height: 360px;
+            overflow-y: auto;
+        }
+
+        .cmd-group-title {
+            padding: 8px 12px 4px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .cmd-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 36px;
+            padding: 0 12px;
+            border-radius: var(--radius-card);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition-snappy);
+        }
+
+        .cmd-item:hover, .cmd-item.active {
+            background-color: var(--surface-hover);
+            color: var(--text-primary);
+        }
+
+        .cmd-item-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cmd-footer {
+            height: 40px;
+            padding: 0 16px;
+            border-top: 1px solid var(--border-hairline);
+            background-color: var(--bg-canvas);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        /* ----------------------------------------------------
+           Skeleton Shimmer Effect
+        ---------------------------------------------------- */
+        .skeleton {
+            background: linear-gradient(90deg, #16181D 25%, #222630 50%, #16181D 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="workspace-switcher">
+                <div class="workspace-info">
+                    <div class="workspace-avatar">L</div>
+                    <div class="workspace-name">Linear Workspace</div>
+                </div>
+                <i data-lucide="chevrons-up-down" style="width: 14px; height: 14px; color: var(--text-tertiary);"></i>
+            </div>
+
+            <button class="quick-action-btn" id="open-cmd-btn">
+                <span style="display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="search" style="width: 14px; height: 14px;"></i>
+                    Search or jump to...
+                </span>
+                <kbd>⌘K</kbd>
+            </button>
+
+            <!-- Main Links -->
+            <nav class="nav-group">
+                <a href="#" class="nav-item">
+                    <div class="nav-item-left">
+                        <i data-lucide="inbox" class="nav-icon"></i>
+                        <span>Inbox</span>
+                    </div>
+                    <span class="nav-badge">4</span>
+                </a>
+                <a href="#" class="nav-item active">
+                    <div class="nav-item-left">
+                        <i data-lucide="layers" class="nav-icon"></i>
+                        <span>My Issues</span>
+                    </div>
+                    <span class="nav-badge">12</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-item-left">
+                        <i data-lucide="check-square" class="nav-icon"></i>
+                        <span>Views</span>
+                    </div>
+                </a>
+            </nav>
+
+            <!-- Workspace Projects -->
+            <nav class="nav-group">
+                <div class="nav-header">Projects</div>
+                <a href="#" class="nav-item">
+                    <div class="nav-item-left">
+                        <i data-lucide="folder-kanban" class="nav-icon"></i>
+                        <span>Core Platform v2</span>
+                    </div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-item-left">
+                        <i data-lucide="sparkles" class="nav-icon"></i>
+                        <span>Design System Tokens</span>
+                    </div>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-item-left">
+                        <i data-lucide="zap" class="nav-icon"></i>
+                        <span>Engine Optimization</span>
+                    </div>
+                </a>
+            </nav>
+
+            <!-- Bottom Settings -->
+            <nav class="nav-group" style="margin-top: auto;">
+                <a href="#" class="nav-item">
+                    <div class="nav-item-left">
+                        <i data-lucide="settings" class="nav-icon"></i>
+                        <span>Workspace Settings</span>
+                    </div>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Workspace Stage -->
+        <div class="main-stage">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <div class="breadcrumbs">
+                        <span class="breadcrumb-item">Workspace</span>
+                        <i data-lucide="chevron-right" style="width: 12px; height: 12px; color: var(--text-tertiary);"></i>
+                        <span class="breadcrumb-item active">All Issues</span>
+                    </div>
+                    
+                    <div class="view-switcher">
+                        <button class="view-btn active">
+                            <i data-lucide="list" style="width: 13px; height: 13px;"></i>
+                            List
+                        </button>
+                        <button class="view-btn">
+                            <i data-lucide="kanban" style="width: 13px; height: 13px;"></i>
+                            Board
+                        </button>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <button class="btn btn-secondary">
+                        <i data-lucide="sliders-horizontal" style="width: 13px; height: 13px;"></i>
+                        Display
+                    </button>
+                    <button class="btn btn-primary" id="new-issue-btn">
+                        <i data-lucide="plus" style="width: 14px; height: 14px;"></i>
+                        New Issue
+                    </button>
+                </div>
+            </header>
+
+            <!-- Filter Toolbar -->
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <button class="filter-chip active">
+                        <i data-lucide="filter" style="width: 12px; height: 12px;"></i>
+                        Status: Active
+                    </button>
+                    <button class="filter-chip">
+                        <i data-lucide="user" style="width: 12px; height: 12px;"></i>
+                        Assignee
+                    </button>
+                    <button class="filter-chip">
+                        <i data-lucide="arrow-up-right" style="width: 12px; height: 12px;"></i>
+                        Priority
+                    </button>
+                </div>
+                <div class="display-options">
+                    <span>12 Issues</span>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- High-Density Table Container -->
+                <div class="table-container">
+                    <div class="data-header-row">
+                        <div class="col-status"></div>
+                        <div class="col-priority">P</div>
+                        <div class="col-id">ID</div>
+                        <div class="col-title">Title</div>
+                        <div class="col-assignee">Assignee</div>
+                        <div class="col-due">Due</div>
+                    </div>
+
+                    <!-- Data Rows -->
+                    <div class="data-row spotlight-card selected" onclick="selectRow(this)">
+                        <div class="col-status"><i data-lucide="loader" class="icon-progress" style="width: 14px; height: 14px;"></i></div>
+                        <div class="col-priority"><i data-lucide="chevrons-up" style="width: 14px; height: 14px; color: #EF4444;"></i></div>
+                        <div class="col-id text-mono">LIN-104</div>
+                        <div class="col-title">
+                            Implement WebSockets for real-time collaboration
+                            <span class="tag">Backend</span>
+                        </div>
+                        <div class="col-assignee">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="avatar-img" alt="">
+                            <span class="text-meta" style="color: var(--text-primary);">Felix</span>
+                        </div>
+                        <div class="col-due text-meta">Today</div>
+                    </div>
+
+                    <div class="data-row spotlight-card" onclick="selectRow(this)">
+                        <div class="col-status"><i data-lucide="check-circle-2" class="icon-done" style="width: 14px; height: 14px;"></i></div>
+                        <div class="col-priority"><i data-lucide="minus" style="width: 14px; height: 14px; color: var(--text-tertiary);"></i></div>
+                        <div class="col-id text-mono">LIN-103</div>
+                        <div class="col-title">
+                            Design system token architecture update
+                            <span class="tag">Design</span>
+                            <span class="tag">Token</span>
+                        </div>
+                        <div class="col-assignee">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" class="avatar-img" alt="">
+                            <span class="text-meta" style="color: var(--text-primary);">Aneka</span>
+                        </div>
+                        <div class="col-due text-meta">Yesterday</div>
+                    </div>
+
+                    <div class="data-row spotlight-card" onclick="selectRow(this)">
+                        <div class="col-status"><i data-lucide="circle-dashed" class="icon-backlog" style="width: 14px; height: 14px;"></i></div>
+                        <div class="col-priority"><i data-lucide="chevron-down" style="width: 14px; height: 14px; color: var(--text-secondary);"></i></div>
+                        <div class="col-id text-mono">LIN-098</div>
+                        <div class="col-title">
+                            Refactor billing dashboard components
+                            <span class="tag">Frontend</span>
+                        </div>
+                        <div class="col-assignee">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Jack" class="avatar-img" alt="">
+                            <span class="text-meta" style="color: var(--text-primary);">Jack</span>
+                        </div>
+                        <div class="col-due text-meta">Oct 14</div>
+                    </div>
+
+                    <div class="data-row spotlight-card" onclick="selectRow(this)">
+                        <div class="col-status"><i data-lucide="x-circle" class="icon-canceled" style="width: 14px; height: 14px;"></i></div>
+                        <div class="col-priority"><i data-lucide="chevron-up" style="width: 14px; height: 14px; color: #F59E0B;"></i></div>
+                        <div class="col-id text-mono">LIN-075</div>
+                        <div class="col-title">
+                            Migrate build pipeline from Webpack to Vite
+                            <span class="tag">DevOps</span>
+                        </div>
+                        <div class="col-assignee">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah" class="avatar-img" alt="">
+                            <span class="text-meta" style="color: var(--text-primary);">Sarah</span>
+                        </div>
+                        <div class="col-due text-meta">Sep 28</div>
+                    </div>
+
+                    <div class="data-row spotlight-card" onclick="selectRow(this)">
+                        <div class="col-status"><i data-lucide="loader" class="icon-progress" style="width: 14px; height: 14px;"></i></div>
+                        <div class="col-priority"><i data-lucide="chevrons-up" style="width: 14px; height: 14px; color: #EF4444;"></i></div>
+                        <div class="col-id text-mono">LIN-062</div>
+                        <div class="col-title">
+                            Fix hairline border blur on high DPI displays
+                            <span class="tag">CSS</span>
+                        </div>
+                        <div class="col-assignee">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="avatar-img" alt="">
+                            <span class="text-meta" style="color: var(--text-primary);">Felix</span>
+                        </div>
+                        <div class="col-due text-meta">Oct 18</div>
+                    </div>
+                </div>
+
+                <!-- Right Detail Panel -->
+                <aside class="detail-panel" id="detail-panel">
+                    <div class="panel-header">
+                        <span class="text-mono">LIN-104</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-secondary" style="padding: 0 6px;" onclick="closePanel()">
+                                <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="panel-content">
+                        <div class="text-section">Implement WebSockets for real-time collaboration</div>
+
+                        <div class="panel-property-grid">
+                            <span class="property-label">Status</span>
+                            <div class="property-value">
+                                <i data-lucide="loader" class="icon-progress" style="width: 14px; height: 14px;"></i>
+                                In Progress
+                            </div>
+
+                            <span class="property-label">Priority</span>
+                            <div class="property-value">
+                                <i data-lucide="chevrons-up" style="width: 14px; height: 14px; color: #EF4444;"></i>
+                                Urgent
+                            </div>
+
+                            <span class="property-label">Assignee</span>
+                            <div class="property-value">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="avatar-img" alt="">
+                                Felix Vance
+                            </div>
+
+                            <span class="property-label">Due Date</span>
+                            <div class="property-value">Today (Oct 12)</div>
+                        </div>
+
+                        <div>
+                            <div class="text-meta" style="margin-bottom: 8px;">Description</div>
+                            <div class="text-body" style="color: var(--text-secondary); font-size: 13px; line-height: 1.5;">
+                                Replace existing REST polling endpoints with a resilient WebSocket connection layer. Ensure automatic reconnection with exponential backoff and message queuing during intermittent offline states.
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <!-- ⌘K Floating Command Modal Overlay -->
+    <div class="modal-backdrop" id="cmd-modal-backdrop">
+        <div class="cmd-modal spotlight-card" id="cmd-modal">
+            <div class="cmd-search-header">
+                <i data-lucide="search" style="width: 16px; height: 16px; color: var(--text-secondary);"></i>
+                <input type="text" class="cmd-input" id="cmd-input" placeholder="Type a command or search..." autocomplete="off">
+                <kbd>ESC</kbd>
+            </div>
+
+            <div class="cmd-list">
+                <div class="cmd-group-title">Suggestions</div>
+                <div class="cmd-item active">
+                    <div class="cmd-item-left">
+                        <i data-lucide="plus-circle" style="width: 15px; height: 15px;"></i>
+                        <span>Create new issue...</span>
+                    </div>
+                    <kbd>C</kbd>
+                </div>
+                <div class="cmd-item">
+                    <div class="cmd-item-left">
+                        <i data-lucide="search" style="width: 15px; height: 15px;"></i>
+                        <span>Search issues by key or text</span>
+                    </div>
+                    <kbd>F</kbd>
+                </div>
+
+                <div class="cmd-group-title">Navigation</div>
+                <div class="cmd-item">
+                    <div class="cmd-item-left">
+                        <i data-lucide="inbox" style="width: 15px; height: 15px;"></i>
+                        <span>Go to Inbox</span>
+                    </div>
+                    <kbd>G then I</kbd>
+                </div>
+                <div class="cmd-item">
+                    <div class="cmd-item-left">
+                        <i data-lucide="layers" style="width: 15px; height: 15px;"></i>
+                        <span>Go to My Issues</span>
+                    </div>
+                    <kbd>G then M</kbd>
+                </div>
+            </div>
+
+            <div class="cmd-footer">
+                <span>Use <kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
+                <span>Press <kbd>↵</kbd> to select</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Interactivity -->
+    <script>
+        lucide.createIcons();
+
+        // Mouse Move Spotlight Effect
+        document.querySelectorAll('.spotlight-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // Command Modal Open/Close
+        const backdrop = document.getElementById('cmd-modal-backdrop');
+        const cmdBtn = document.getElementById('open-cmd-btn');
+        const cmdInput = document.getElementById('cmd-input');
+
+        function openModal() {
+            backdrop.classList.add('open');
+            cmdInput.focus();
+        }
+
+        function closeModal() {
+            backdrop.classList.remove('open');
+        }
+
+        cmdBtn.addEventListener('click', openModal);
+
+        backdrop.addEventListener('click', (e) => {
+            if (e.target === backdrop) closeModal();
+        });
+
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                backdrop.classList.contains('open') ? closeModal() : openModal();
+            }
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Row Selection Interactivity
+        function selectRow(element) {
+            document.querySelectorAll('.data-row').forEach(row => row.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+
+        function closePanel() {
+            document.getElementById('detail-panel').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
